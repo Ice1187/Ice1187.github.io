@@ -155,6 +155,176 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-elf-file-format" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/11/16/elf-file-format/">ELF file format</a>
+    </h1>
+  
+
+        
+        <a href="/2019/11/16/elf-file-format/" class="archive-article-date">
+  	<time datetime="2019-11-16T14:22:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-11-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>A note about ELF format.<br>The definition of standard ELF types, structures, and macros is in <code>elf.h</code>. You can find it by <code>whereis</code> command.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ whereis elf.h</span><br><span class="line">elf: /usr/include/elf.h</span><br></pre></td></tr></table></figure>
+
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><code>/usr/include/elf.h</code></li>
+<li><a href="https://docs.oracle.com/cd/E19683-01/816-1386/6m7qcoblh/index.html" target="_blank" rel="noopener">Chapter 7 Object File Format</a></li>
+</ul>
+<h2 id="Overview-of-ELF"><a href="#Overview-of-ELF" class="headerlink" title="Overview of ELF"></a>Overview of ELF</h2><h2 id="ELF-Header"><a href="#ELF-Header" class="headerlink" title="ELF Header"></a>ELF Header</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /usr/include/elf.h</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> EI_NIDENT (16)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">char</span>	e_ident[EI_NIDENT];	<span class="comment">/* Magic number and other info */</span></span><br><span class="line">  Elf64_Half	e_type;			<span class="comment">/* Object file type */</span></span><br><span class="line">  Elf64_Half	e_machine;		<span class="comment">/* Architecture */</span></span><br><span class="line">  Elf64_Word	e_version;		<span class="comment">/* Object file version */</span></span><br><span class="line">  Elf64_Addr	e_entry;		<span class="comment">/* Entry point virtual address */</span></span><br><span class="line">  Elf64_Off	e_phoff;		<span class="comment">/* Program header table file offset */</span></span><br><span class="line">  Elf64_Off	e_shoff;		<span class="comment">/* Section header table file offset */</span></span><br><span class="line">  Elf64_Word	e_flags;		<span class="comment">/* Processor-specific flags */</span></span><br><span class="line">  Elf64_Half	e_ehsize;		<span class="comment">/* ELF header size in bytes */</span></span><br><span class="line">  Elf64_Half	e_phentsize;		<span class="comment">/* Program header table entry size */</span></span><br><span class="line">  Elf64_Half	e_phnum;		<span class="comment">/* Program header table entry count */</span></span><br><span class="line">  Elf64_Half	e_shentsize;		<span class="comment">/* Section header table entry size */</span></span><br><span class="line">  Elf64_Half	e_shnum;		<span class="comment">/* Section header table entry count */</span></span><br><span class="line">  Elf64_Half	e_shstrndx;		<span class="comment">/* Section header string table index */</span></span><br><span class="line">&#125; Elf64_Ehdr;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>e_ident[16] : Magic number and other machine-independent data<ul>
+<li>[0x0 - 0x3] EI_MAG0 - EI_MAG3 : The magic number. <ul>
+<li>0x7f 0x45 0x4c 0x46 : “\x7fELF” </li>
+</ul>
+</li>
+<li>[0x4] EI_CLASS : The file is 32 or 64 bit.<ul>
+<li>0x0 : Invalid class</li>
+<li>0x1 : 32 bit</li>
+<li>0x2 : 64 bit</li>
+<li>0x3 : other format</li>
+</ul>
+</li>
+<li>[0x5] EI_DATA : The complement and endian / data encoding.<ul>
+<li>0x0 : Invalid data encoding</li>
+<li>0x1 : 2’s complement, little endian</li>
+<li>0x2 : 2’s complement, big endian</li>
+<li>0x3 : other format</li>
+</ul>
+</li>
+<li>[0x6] EI_VERSION : The version of the ELF file.<ul>
+<li>0x1 : Must of it should be set to 1 </li>
+<li>Accoding to the <code>elf.h</code>, this value must be EV_CURRENT </li>
+</ul>
+</li>
+<li>[0x7] EI_OSABI : The identification of the OS ABI.<ul>
+<li>0x00 : UNIX System V ABI</li>
+<li>0x03 : GNU ELF extensions</li>
+<li>0x09 : FreeBSD</li>
+<li>0x61 : ARM</li>
+<li>0xff : Standalone (embedded) applocation</li>
+</ul>
+</li>
+<li>[0x8] EI_ABIVERSION : ABI version.</li>
+<li>[0x9] EI_PAD : Marks the beginning of the unused bytes in e_ident. Might be changed in th future.</li>
+</ul>
+</li>
+<li>e_type[2] : Object file type.<ul>
+<li>0x0000 ET_NONE   : No file type</li>
+<li>0x0001 ET_REL    : Relocatable file </li>
+<li>0x0002 ET_EXEC   : Executable file </li>
+<li>0x0003 ET_DYN    : Shared object file</li>
+<li>0x0004 ET_CORE   : Core file</li>
+<li>0xff00 ET_LOPROC : Processor-specific</li>
+<li>0xffff ET_HIPROC : Processor-specific</li>
+</ul>
+</li>
+<li>e_machine[2] : The architecture for the file.<ul>
+<li>0x00 EM_NONE  : No machine</li>
+<li>0x01 EM_M32   : AT&amp;T WE 32100</li>
+<li>0x02 EM_SPARC : SPARC</li>
+<li>0x03 EM_386   : intel 80386</li>
+<li>0x08 EM_MIPS  : MIPS R3000 big-endian</li>
+<li>0x12 EM_SPARC32PLUS : Sun SPARC 32+</li>
+<li>0x28 EM_ARM   : ARM</li>
+<li>0x2b EM_SPARCV9 : SPARC V9 </li>
+<li>0x3e EM_x86_64 : AMD x86-64 architecture</li>
+<li>0x4b EM_VAX   : Digital VAX</li>
+<li>0x5c EM_OPENRISC : OpenRISC 32-bit embedded processor</li>
+<li>0xf3 EM_RISCV : RISC-V</li>
+</ul>
+</li>
+<li>e_version[4] : The object file version<ul>
+<li>0x0 EV_NONE : Invalid version</li>
+<li>0x1 EV_CURRENT : Current version</li>
+<li>0x2 EV_NUM</li>
+</ul>
+</li>
+<li>e_enrty[8] : The entry point(virtual address) of the program. If there is no entry point, it holds zero.</li>
+<li>e_phoff[8] : The offset of the program header table in bytes. If thers is no program header table, it holds zero.</li>
+<li>e_shoff[8] : The offset of the section header table in bytes. If thers is no program header table, it holds zero.</li>
+<li>e_flags[4] : Processor-specific flags associated with the file.</li>
+<li>e_ehsize[2] : The size of the ELF header in bytes.</li>
+<li>e_phentsize[2] : The size of the program headers in bytes. Every program header has same size.</li>
+<li>e_phnum[2] : The number of entries in the program header table.</li>
+<li>e_shentsize[2] : The size of the section headers in bytes. Every section header is an entry in section header table. Every section header has same size.</li>
+<li>e_shnum[2] : The number of entries in the section header table.</li>
+<li>e_shstrndx[2] : Section header string table index. The nth of .shstrtab in the section header table. If there is no section name string table, t it holds the value of SHN_UNDEF.</li>
+</ul>
+<h2 id="Section-Header"><a href="#Section-Header" class="headerlink" title="Section Header"></a>Section Header</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// /usr/include/elf.h</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  Elf64_Word	sh_name;		<span class="comment">/* Section name (string tbl index) */</span></span><br><span class="line">  Elf64_Word	sh_type;		<span class="comment">/* Section type */</span></span><br><span class="line">  Elf64_Xword	sh_flags;		<span class="comment">/* Section flags */</span></span><br><span class="line">  Elf64_Addr	sh_addr;		<span class="comment">/* Section virtual addr at execution */</span></span><br><span class="line">  Elf64_Off	sh_offset;		<span class="comment">/* Section file offset */</span></span><br><span class="line">  Elf64_Xword	sh_size;		<span class="comment">/* Section size in bytes */</span></span><br><span class="line">  Elf64_Word	sh_link;		<span class="comment">/* Link to another section */</span></span><br><span class="line">  Elf64_Word	sh_info;		<span class="comment">/* Additional section information */</span></span><br><span class="line">  Elf64_Xword	sh_addralign;		<span class="comment">/* Section alignment */</span></span><br><span class="line">  Elf64_Xword	sh_entsize;		<span class="comment">/* Entry size if section holds table */</span></span><br><span class="line">&#125; Elf64_Shdr;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li></li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color4">lab</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color4">elf</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/11/16/elf-file-format/">more >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-go-go-go" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -385,6 +555,14 @@ MathJax.Hub.Queue(function() {
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color4">lab</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color4">elf</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
