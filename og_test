@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Testing Open Graph</title>
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="FB Open Graph Test" />
+    <meta
+      property="og:description"
+      content="I'm testing open graph on the SS class~~~"
+    />
+    <meta
+      property="og:image"
+      content="https://static.toiimg.com/photo/msid-67586673/67586673.jpg?3918697"
+    />
+  </head>
+  <body>
+    <div style="text-align: center">text here Hello</div>
+    <!--<img
+      src="https://static.toiimg.com/photo/msid-67586673/67586673.jpg?3918697"
+      width="100"
+      height="100"
+    />-->
+    <h1>Hello~~~</h1>
+  </body>
+</html>
