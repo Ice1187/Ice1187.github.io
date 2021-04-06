@@ -1,7 +1,17 @@
-let hero_img = document.querySelector("#ArticleImage__Hero img");
 
-window.onload = function() {
-	console.log(hero_img.height);
-	hero_img.style.marginTop = (480 - hero_img.height)/2;
+function repositionImg() {
+	let hero_img = document.querySelector("#ArticleImage__Hero img");
+	let img_container = document.querySelector("#ArticleImage__Hero");
+	let container_h = img_container.clientHeight;
+	let img_h = hero_img.height;
+	// console.log(img_h);
+	// console.log(container_h);
+	if (img_h > container_h) {
+		hero_img.style.marginTop = (container_h - img_h)/2;
+	}
 }
 
+window.onload = repositionImg;
+
+window.onresize = repositionImg;
+	
